@@ -7,10 +7,12 @@ import {
   Param,
   Body,
 } from '@nestjs/common';
+import { ProductService } from './product.service';
 // import { User } from './user.entity';
 
-@Controller('user')
+@Controller('product')
 export class ProductController {
+  constructor(private productService: ProductService) {}
   @Get(':id')
   findOne(@Param('id') id) {
     return `Hi product with ${id}`;
