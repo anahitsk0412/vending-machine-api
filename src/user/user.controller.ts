@@ -13,7 +13,7 @@ import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
-  constructor(public userService: UserService) {}
+  constructor(private userService: UserService) {}
   // deposit [5, 10, 20, 50 and 100]
   // reset back to 0 by deposit [5, 10, 20, 50 and 100]
   @Get(':id')

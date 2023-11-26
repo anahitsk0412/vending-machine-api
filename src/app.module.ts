@@ -5,6 +5,8 @@ import { AppService } from './app.service';
 import { Product } from './product/product.entity';
 import { UserModule } from './user/user.module';
 import { User } from './user/user.entity';
+import { ProductModule } from './product/product.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { User } from './user/user.entity';
       synchronize: true,
     }),
     UserModule,
+    ProductModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
