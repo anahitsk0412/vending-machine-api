@@ -23,6 +23,11 @@ export class ProductService {
     return this.repo.save({ ...product, ...attrs });
   }
 
+  async updateQuantity(id: number, amountAvailable: number) {
+    const product = await this.findOne(id);
+    return this.repo.save({ ...product, amountAvailable });
+  }
+
   async findOne(id: number) {
     const product = await this.repo.findOne({ where: { id } });
     if (!product) {

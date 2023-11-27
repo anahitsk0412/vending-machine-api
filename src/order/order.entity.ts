@@ -13,7 +13,7 @@ export class Order {
   productId: number;
 
   @Column()
-  productAmount: number;
+  quantity: number;
 
   @Column()
   buyerId: number;
@@ -30,6 +30,10 @@ export class Order {
   @ManyToMany(() => User, (user) => user.orders)
   @Expose()
   sellers: User[];
+
+  @ManyToMany(() => User, (user) => user.purchases)
+  @Expose()
+  buyers: User[];
 
   @ManyToMany(() => Product, (product) => product.orders)
   @Expose()

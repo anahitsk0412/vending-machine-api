@@ -5,12 +5,18 @@ import { ProductModule } from '../product/product.module';
 import { UserModule } from '../user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order } from './order.entity';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { CurrentUserInterceptor } from '../user/interceptors/current-user.interceptor';
 
 @Module({
   imports: [ProductModule, UserModule, TypeOrmModule.forFeature([Order])],
-  providers: [OrderService],
+  providers: [
+    OrderService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CurrentUserInterceptor,
+    },
+  ],
   controllers: [OrderController],
 })
 export class OrderModule {}
-
-//: buy check only for buyer role

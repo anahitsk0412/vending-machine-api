@@ -7,7 +7,6 @@ import {
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { UserRole } from '../types/user-role.type';
-import { UserDepositType } from '../types/user-deposit.type';
 
 export class CreateUserDto {
   @IsString()
@@ -20,7 +19,7 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsNumber()
-  deposit?: UserDepositType;
+  deposit?: number;
 
   @Transform(({ value }) => ('' + value).toLowerCase())
   @IsEnum(UserRole)
