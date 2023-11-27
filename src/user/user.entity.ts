@@ -4,11 +4,13 @@ import {
   AfterUpdate,
   Column,
   Entity,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
 import { Product } from '../product/product.entity';
+import { Order } from '../order/order.entity';
 
 @Entity('user')
 export class User {
@@ -32,6 +34,10 @@ export class User {
   @OneToMany(() => Product, (product) => product.seller)
   @Expose()
   products: Product[];
+
+  @ManyToMany(() => Order, (order) => order.sellers)
+  @Expose()
+  orders: Order[];
 
   @AfterInsert()
   logInsert() {

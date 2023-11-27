@@ -1,6 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  ManyToMany,
+} from 'typeorm';
 import { Expose } from 'class-transformer';
 import { User } from '../user/user.entity';
+import { Order } from '../order/order.entity';
 
 @Entity('product')
 export class Product {
@@ -23,4 +30,8 @@ export class Product {
   @ManyToOne(() => User, (user) => user.products)
   @Expose()
   seller: User;
+
+  @ManyToMany(() => Order, (order) => order.products)
+  @Expose()
+  orders: Order[];
 }
