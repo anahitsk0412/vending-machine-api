@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { User } from './user/user.entity';
 import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
+import { Order } from './order/order.entity';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { OrderModule } from './order/order.module';
       username: 'root',
       password: 'password123',
       database: 'vending-machine',
-      entities: [User, Product],
+      entities: [User, Product, Order],
       synchronize: true,
     }),
     UserModule,

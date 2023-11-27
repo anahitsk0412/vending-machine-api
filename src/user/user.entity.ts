@@ -14,13 +14,13 @@ export class User {
   @Expose()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   username: string;
 
   @Column()
   password: string;
 
-  @Column('decimal', { nullable: true, default: 0 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   deposit: number;
 
   @Column()

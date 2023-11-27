@@ -10,6 +10,7 @@ import {
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserService } from './user.service';
+import { UserDepositType } from './types/user-deposit.type';
 
 @Controller('user')
 export class UserController {
@@ -17,8 +18,8 @@ export class UserController {
   // deposit [5, 10, 20, 50 and 100]
   // reset back to 0 by deposit [5, 10, 20, 50 and 100]
   @Get(':id')
-  findOne(@Param('id') id) {
-    return `Hi user with ${id}`;
+  findUserById(@Param('id') id) {
+    return this.userService.findOne(id);
   }
 
   @Get()
@@ -27,14 +28,15 @@ export class UserController {
   }
 
   @Post()
-  signup(@Body() body: CreateUserDto) {
+  signUp(@Body() body: CreateUserDto) {
     const { username, password, role } = body;
     return this.userService.create(username, password, role);
   }
 
   @Patch('deposit')
   deposit(@Body() body: UpdateUserDto) {
-    return 'deposit';
+    const deposit: UserDepositType = body.deposit;
+    return this.userService.deposit(2, deposit);
   }
 
   @Patch('reset')
@@ -44,7 +46,7 @@ export class UserController {
 
   @Patch(':id')
   update(@Param('id') id: number, @Body() body: UpdateUserDto) {
-    return 'update';
+    return this.userService.update(2, body);
   }
 
   @Delete(':id')
