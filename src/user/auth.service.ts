@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { UserRole } from './types/user-role.type';
-import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserService } from './user.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
@@ -43,16 +42,20 @@ export class AuthService {
     return user;
   }
 
-  async update(id: number, attrs: UpdateUserDto) {
-    const user = await this.findOne(id);
-    return this.repo.save({ ...user, ...attrs });
-  }
-
-  async findOne(id: number) {
-    const user = await this.repo.findOne({ where: { id } });
+  async signIn(email: string, password: string) {
+    const [user] = await this.userService.find(email);
     if (!user) {
       throw new NotFoundException('User not found!');
     }
+
+    const [salt, storedHash] = user.password.split('.');
+
+    const hash = (await scrypt(password, salt, 32)) as Buffer;
+
+    if (storedHash !== hash.toString('hex')) {
+      throw new BadRequestException('Bad password!');
+    }
+
     return user;
   }
 }
