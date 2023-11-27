@@ -40,12 +40,18 @@ export class ProductController {
   @Patch(':id')
   @UseGuards(AuthGuard)
   update(@Param('id') id, @Body() productData, @CurrentUser() user: UserDto) {
-    return this.productService.update(id, productData);
+    if (user.role !== 'seller') {
+      throw new MethodNotAllowedException('Not enough permissions!');
+    }
+    return this.productService.update(id, productData, user);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard)
   remove(@Param('id') id, @CurrentUser() user: UserDto) {
-    return this.productService.remove(id);
+    if (user.role !== 'seller') {
+      throw new MethodNotAllowedException('Not enough permissions!');
+    }
+    return this.productService.remove(id, user);
   }
 }

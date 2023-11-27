@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, MethodNotAllowedException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './product.entity';
@@ -15,8 +15,11 @@ export class ProductService {
     return this.repo.save(product);
   }
 
-  async update(id: number, attrs: ProductUpdateDto) {
+  async update(id: number, attrs: ProductUpdateDto, user: UserDto) {
     const product = await this.findOne(id);
+    if (user.id !== product.sellerId) {
+      throw new MethodNotAllowedException('Not enough permissions!');
+    }
     return this.repo.save({ ...product, ...attrs });
   }
 
@@ -32,8 +35,11 @@ export class ProductService {
     return this.repo.find();
   }
 
-  async remove(id: number) {
+  async remove(id: number, user: UserDto) {
     const product = await this.findOne(id);
+    if (user.id !== product.sellerId) {
+      throw new MethodNotAllowedException('Not enough permissions!');
+    }
     return this.repo.remove(product);
   }
 }
