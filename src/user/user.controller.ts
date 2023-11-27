@@ -8,12 +8,13 @@ import {
   Body,
   Session,
   UseGuards,
+  MethodNotAllowedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserService } from './user.service';
 import { UserDepositType } from './types/user-deposit.type';
-import { Serialize } from './interceptors/serialize.interceptor';
+import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '../guards/auth.guard';
@@ -42,6 +43,7 @@ export class UserController {
   async signUp(@Body() body: CreateUserDto, @Session() session: any) {
     const { username, password, role } = body;
     const user = await this.authService.signUp(username, password, role);
+    session.userId = user.id;
 
     return user;
   }
@@ -59,12 +61,15 @@ export class UserController {
   @UseGuards(AuthGuard)
   async signOut(@Session() session: any) {
     session.userId = null;
+    session.currentUser = null;
   }
 
   @Patch('deposit')
   @UseGuards(AuthGuard)
   deposit(@Body() body: UpdateUserDto, @CurrentUser() user: UserDto) {
-    // get current user id
+    if (user.role !== 'buyer') {
+      throw new MethodNotAllowedException('Not enough permissions!');
+    }
     const deposit: UserDepositType = body.deposit;
     return this.userService.deposit(user.id, deposit);
   }
@@ -72,6 +77,9 @@ export class UserController {
   @Patch('reset')
   @UseGuards(AuthGuard)
   resetBalance(@CurrentUser() user: UserDto) {
+    if (user.role === 'buyer') {
+      throw new MethodNotAllowedException('Not enough permissions!');
+    }
     // get current user id
     return this.userService.resetBalance(user.id);
   }
