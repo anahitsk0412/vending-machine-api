@@ -8,32 +8,32 @@ import {
   Body,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-// import { User } from './user.entity';
 
 @Controller('product')
 export class ProductController {
   constructor(private productService: ProductService) {}
   @Get(':id')
   findOne(@Param('id') id) {
-    return `Hi product with ${id}`;
+    return this.productService.findOne(id);
   }
 
   @Get()
-  findAll(): string {
-    return 'This are all products';
-  }
-
-  @Get('/search/:name')
-  searchByName(@Param('name') name): string {
-    return 'This are all searched products';
+  findAll() {
+    return this.productService.findAll();
   }
 
   @Post()
-  create(@Body() productData) {}
+  create(@Body() productData) {
+    return this.productService.create(productData);
+  }
 
   @Patch(':id')
-  update(@Param('id') id, @Body() productData) {}
+  update(@Param('id') id, @Body() productData) {
+    return this.productService.update(id, productData);
+  }
 
   @Delete(':id')
-  remove(@Param('id') id) {}
+  remove(@Param('id') id) {
+    return this.productService.remove(id);
+  }
 }

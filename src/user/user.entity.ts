@@ -4,9 +4,11 @@ import {
   AfterUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
+import { Product } from '../product/product.entity';
 
 @Entity('user')
 export class User {
@@ -26,6 +28,10 @@ export class User {
 
   @Column()
   role: 'seller' | 'buyer' | 'admin';
+
+  @OneToMany(() => Product, (product) => product.seller)
+  @Expose()
+  products: Product[];
 
   @AfterInsert()
   logInsert() {
