@@ -27,7 +27,10 @@ export class UserController {
   }
 
   @Post()
-  create(@Body() body: CreateUserDto) {}
+  signup(@Body() body: CreateUserDto) {
+    const { username, password, role } = body;
+    return this.userService.create(username, password, role);
+  }
 
   @Patch('deposit')
   deposit(@Body() body: UpdateUserDto) {

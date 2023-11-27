@@ -1,4 +1,10 @@
-import { IsDecimal, IsEnum, IsString, Length } from 'class-validator';
+import {
+  IsDecimal,
+  IsEnum,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { UserRole } from '../types/user-role.type';
 
@@ -12,7 +18,8 @@ export class CreateUserDto {
   password: string;
 
   @IsDecimal()
-  deposit: number;
+  @IsOptional()
+  deposit?: number;
 
   @Transform(({ value }) => ('' + value).toLowerCase())
   @IsEnum(UserRole)
