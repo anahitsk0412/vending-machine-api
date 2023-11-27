@@ -4,12 +4,13 @@ import { Repository } from 'typeorm';
 import { Product } from './product.entity';
 import { ProductCreateDto } from './dtos/create-product.dto';
 import { ProductUpdateDto } from './dtos/update-product.dto';
+import { UserDto } from '../user/dtos/user.dto';
 
 @Injectable()
 export class ProductService {
   constructor(@InjectRepository(Product) private repo: Repository<Product>) {}
-  create(body: ProductCreateDto) {
-    const product = this.repo.create(body);
+  create(body: ProductCreateDto, user: UserDto) {
+    const product = this.repo.create({ ...body, sellerId: user.id });
 
     return this.repo.save(product);
   }

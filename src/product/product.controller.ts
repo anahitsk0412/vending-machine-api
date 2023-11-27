@@ -6,34 +6,46 @@ import {
   Delete,
   Param,
   Body,
+  UseGuards,
+  MethodNotAllowedException,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
+import { AuthGuard } from '../guards/auth.guard';
+import { CurrentUser } from '../user/decorators/current-user.decorator';
+import { UserDto } from '../user/dtos/user.dto';
 
 @Controller('product')
 export class ProductController {
   constructor(private productService: ProductService) {}
   @Get(':id')
+  @UseGuards(AuthGuard)
   findOne(@Param('id') id) {
     return this.productService.findOne(id);
   }
-
   @Get()
+  @UseGuards(AuthGuard)
   findAll() {
     return this.productService.findAll();
   }
 
   @Post()
-  create(@Body() productData) {
-    return this.productService.create(productData);
+  @UseGuards(AuthGuard)
+  create(@Body() productData, @CurrentUser() user: UserDto) {
+    if (user.role !== 'seller') {
+      throw new MethodNotAllowedException('Not enough permissions!');
+    }
+    return this.productService.create(productData, user);
   }
 
   @Patch(':id')
-  update(@Param('id') id, @Body() productData) {
+  @UseGuards(AuthGuard)
+  update(@Param('id') id, @Body() productData, @CurrentUser() user: UserDto) {
     return this.productService.update(id, productData);
   }
 
   @Delete(':id')
-  remove(@Param('id') id) {
+  @UseGuards(AuthGuard)
+  remove(@Param('id') id, @CurrentUser() user: UserDto) {
     return this.productService.remove(id);
   }
 }

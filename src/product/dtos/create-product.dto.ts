@@ -12,5 +12,5 @@ export class ProductCreateDto {
   amountAvailable: number;
 
   @IsNumber()
-  sellerId: number;
+  sellerId?: number;
 }
