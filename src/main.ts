@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
@@ -23,6 +24,16 @@ async function bootstrap() {
     res.removeHeader('date');
     next();
   });
+
+  const config = new DocumentBuilder()
+    .setTitle('Vending Machine App')
+    .setDescription('The Vending Machine API description')
+    .setVersion('1.0')
+    .addTag('vending-machine')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   await app.listen(3000);
 }
 bootstrap();
