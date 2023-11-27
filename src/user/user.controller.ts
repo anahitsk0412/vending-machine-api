@@ -21,12 +21,6 @@ export class UserController {
   findUserById(@Param('id') id) {
     return this.userService.findOne(id);
   }
-
-  @Get()
-  findAll(): string {
-    return 'This is me';
-  }
-
   @Post()
   signUp(@Body() body: CreateUserDto) {
     const { username, password, role } = body;
@@ -35,20 +29,24 @@ export class UserController {
 
   @Patch('deposit')
   deposit(@Body() body: UpdateUserDto) {
+    // get current user id
     const deposit: UserDepositType = body.deposit;
     return this.userService.deposit(2, deposit);
   }
 
   @Patch('reset')
-  reset() {
-    return 'reset';
+  resetBalance() {
+    // get current user id
+    return this.userService.resetBalance(2);
   }
 
   @Patch(':id')
   update(@Param('id') id: number, @Body() body: UpdateUserDto) {
-    return this.userService.update(2, body);
+    return this.userService.update(id, body);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {}
+  remove(@Param('id') id: number) {
+    return this.userService.remove(id);
+  }
 }

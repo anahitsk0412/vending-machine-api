@@ -11,6 +11,9 @@ export class Order {
   productId: number;
 
   @Column()
+  productAmount: number;
+
+  @Column()
   buyerId: number;
 
   @Column()
