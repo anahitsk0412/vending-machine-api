@@ -6,7 +6,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 
 @Entity('user')
 export class User {
@@ -18,6 +18,7 @@ export class User {
   username: string;
 
   @Column()
+  @Exclude()
   password: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })

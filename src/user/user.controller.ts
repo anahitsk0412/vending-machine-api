@@ -11,20 +11,31 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserService } from './user.service';
 import { UserDepositType } from './types/user-deposit.type';
+import { Serialize } from './interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
+import { AuthService } from './auth.service';
 
 @Controller('user')
+@Serialize(UserDto)
 export class UserController {
-  constructor(private userService: UserService) {}
-  // deposit [5, 10, 20, 50 and 100]
-  // reset back to 0 by deposit [5, 10, 20, 50 and 100]
+  constructor(
+    private userService: UserService,
+    private authService: AuthService,
+  ) {}
   @Get(':id')
   findUserById(@Param('id') id) {
     return this.userService.findOne(id);
   }
-  @Post()
+  @Post('signup')
   signUp(@Body() body: CreateUserDto) {
     const { username, password, role } = body;
-    return this.userService.create(username, password, role);
+    return this.authService.signUp(username, password, role);
+  }
+
+  @Post('auth')
+  signIn(@Body() body: UpdateUserDto) {
+    const { username, password } = body;
+    //return this.authService.signIn(username, password);
   }
 
   @Patch('deposit')
