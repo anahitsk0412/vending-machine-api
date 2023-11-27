@@ -70,7 +70,7 @@ export class UserController {
     if (user.role !== 'buyer') {
       throw new MethodNotAllowedException('Not enough permissions!');
     }
-    const deposit: UserDepositType = body.deposit;
+    const deposit: number = body.deposit;
     return this.userService.deposit(user.id, deposit);
   }
 

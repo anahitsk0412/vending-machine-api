@@ -22,7 +22,7 @@ export class UserService {
     return this.repo.save({ ...user, ...attrs });
   }
 
-  async deposit(id: number, deposit: UserDepositType) {
+  async deposit(id: number, deposit: number) {
     const user = await this.findOne(id);
     const depositNumber = user.deposit * 100 + deposit;
     return this.repo.save({ ...user, deposit: depositNumber / 100 });
