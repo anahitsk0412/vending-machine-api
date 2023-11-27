@@ -13,7 +13,6 @@ import {
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserService } from './user.service';
-import { UserDepositType } from './types/user-deposit.type';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { AuthService } from './auth.service';
@@ -91,12 +90,18 @@ export class UserController {
     @Body() body: UpdateUserDto,
     @CurrentUser() user: UserDto,
   ) {
+    if (user.role !== 'admin' || user.id !== id) {
+      throw new MethodNotAllowedException('Not enough permissions!');
+    }
     return this.userService.update(id, body);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard)
   remove(@Param('id') id: number, @CurrentUser() user: UserDto) {
+    if (user.role !== 'admin') {
+      throw new MethodNotAllowedException('Not enough permissions!');
+    }
     return this.userService.remove(id);
   }
 }
