@@ -4,7 +4,6 @@ import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { UserRole } from './types/user-role.type';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { UserDepositType } from './types/user-deposit.type';
 import { UserDepositValues } from './user.deposit.constant';
 
 @Injectable()
