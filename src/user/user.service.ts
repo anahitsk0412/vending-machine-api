@@ -4,7 +4,8 @@ import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { UserRole } from './types/user-role.type';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { UserDepositValues } from './user.deposit.constant';
+import { DepositRefillConstants } from '../utils/deposit-refill.constant';
+import { sumToArrayOptions } from '../utils/sum-to-array-options';
 
 @Injectable()
 export class UserService {
@@ -29,9 +30,9 @@ export class UserService {
 
   async resetBalance(id: number) {
     const user = await this.findOne(id);
-    const depositToReturnArray = this.sumToArrayOptions(
+    const depositToReturnArray = sumToArrayOptions(
       user.deposit * 100,
-      UserDepositValues,
+      DepositRefillConstants,
     );
 
     const updatedUser = await this.repo.save({ ...user, deposit: 0 });
@@ -54,21 +55,5 @@ export class UserService {
   async remove(id: number) {
     const user = await this.findOne(id);
     return this.repo.remove(user);
-  }
-
-  sumToArrayOptions(sum: number, options: number[]) {
-    const resultArr = [];
-    let i = options.length - 1;
-
-    while (sum && i >= 0) {
-      const currentSum = sum - options[i];
-      if (currentSum >= 0) {
-        resultArr.push(options[i]);
-        sum = currentSum;
-      } else {
-        i -= 1;
-      }
-    }
-    return resultArr;
   }
 }

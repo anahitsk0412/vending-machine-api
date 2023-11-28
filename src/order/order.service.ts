@@ -5,7 +5,8 @@ import { Order } from './order.entity';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { ProductService } from '../product/product.service';
 import { UserService } from '../user/user.service';
-import { UserDepositValues } from '../user/user.deposit.constant';
+import { DepositRefillConstants } from '../utils/deposit-refill.constant';
+import { sumToArrayOptions } from '../utils/sum-to-array-options';
 
 @Injectable()
 export class OrderService {
@@ -47,9 +48,9 @@ export class OrderService {
       throw new MethodNotAllowedException('Unable to create order!');
     }
 
-    const change = this.userService.sumToArrayOptions(
+    const change = sumToArrayOptions(
       remainingUserBalance,
-      UserDepositValues,
+      DepositRefillConstants,
     );
 
     const product = this.repo.create({

@@ -7,7 +7,7 @@ Vending Machine Api is built on popular [Nest](https://github.com/nestjs/nest) f
 
 ## Installation
 
-# Make sure you have docker installed. The DB (MySQL is being installed an run on docker container.)
+### Make sure you have docker installed. The DB (MySQL is being installed an run on docker container.)
 
 ```bash
 $ yarn install
