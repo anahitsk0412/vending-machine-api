@@ -23,6 +23,6 @@ export class OrderController {
     if (user.role !== 'buyer') {
       throw new MethodNotAllowedException('Not enough permissions!');
     }
-    return this.orderService.create({ ...orderData, buyerId: user.id });
+    return this.orderService.create(orderData, user.id);
   }
 }

@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsNumber } from 'class-validator';
 
 export class CreateOrderDto {
   @IsNumber()
@@ -6,15 +6,4 @@ export class CreateOrderDto {
 
   @IsNumber()
   quantity: number;
-
-  @IsNumber()
-  sellerId: number;
-
-  @IsNumber()
-  @IsOptional()
-  buyerId?: number;
-
-  @IsNumber()
-  @IsOptional()
-  price: number;
 }
