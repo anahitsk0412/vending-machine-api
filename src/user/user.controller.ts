@@ -18,7 +18,12 @@ import { UserDto } from './dtos/user.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { ApiTags } from '@nestjs/swagger';
+import { AuthUserDto } from './dtos/auth-user.dto';
+import { UpdateDepositDto } from './dtos/update-deposit.dto';
+import { UserRole } from './types/user-role.type';
 
+@ApiTags('User')
 @Controller('user')
 @Serialize(UserDto)
 export class UserController {
@@ -29,7 +34,7 @@ export class UserController {
 
   @Get('/whoami')
   @UseGuards(AuthGuard)
-  whoAmI(@CurrentUser() user: UserDto) {
+  async whoAmI(@CurrentUser() user: UserDto): Promise<UserDto> {
     return user;
   }
 
@@ -48,7 +53,10 @@ export class UserController {
   }
 
   @Post('auth')
-  async signIn(@Body() body: UpdateUserDto, @Session() session: any) {
+  async signIn(
+    @Body() body: AuthUserDto,
+    @Session() session: any,
+  ): Promise<UserDto> {
     const { username, password } = body;
     const user = await this.authService.signIn(username, password);
     session.userId = user.id;
@@ -61,22 +69,23 @@ export class UserController {
   async signOut(@Session() session: any) {
     session.userId = null;
     session.currentUser = null;
+    return { message: 'User signed out sucessfully!' };
   }
 
   @Patch('deposit')
   @UseGuards(AuthGuard)
-  deposit(@Body() body: UpdateUserDto, @CurrentUser() user: UserDto) {
-    if (user.role !== 'buyer') {
+  deposit(@Body() body: UpdateDepositDto, @CurrentUser() user: UserDto) {
+    if (user.role !== UserRole.BUYER) {
       throw new MethodNotAllowedException('Not enough permissions!');
     }
     const deposit: number = body.deposit;
     return this.userService.deposit(user.id, deposit);
   }
 
-  @Patch('reset')
+  @Patch('resetbalance')
   @UseGuards(AuthGuard)
   resetBalance(@CurrentUser() user: UserDto) {
-    if (user.role === 'buyer') {
+    if (user.role === UserRole.BUYER) {
       throw new MethodNotAllowedException('Not enough permissions!');
     }
     // get current user id
@@ -90,7 +99,7 @@ export class UserController {
     @Body() body: UpdateUserDto,
     @CurrentUser() user: UserDto,
   ) {
-    if (user.role !== 'admin' || user.id !== id) {
+    if (user.role !== UserRole.ADMIN || user.id !== id) {
       throw new MethodNotAllowedException('Not enough permissions!');
     }
     return this.userService.update(id, body);
@@ -99,7 +108,7 @@ export class UserController {
   @Delete(':id')
   @UseGuards(AuthGuard)
   remove(@Param('id') id: number, @CurrentUser() user: UserDto) {
-    if (user.role !== 'admin') {
+    if (user.role !== UserRole.ADMIN) {
       throw new MethodNotAllowedException('Not enough permissions!');
     }
     return this.userService.remove(id);

@@ -35,12 +35,9 @@ export class AuthService {
 
     // Join the hashed result and the salt together
     const result = salt + '.' + hash.toString('hex');
-    console.log('sqqqqqq', result);
 
     // Create a new user and save it
-    const user = await this.userService.create(username, result, role);
-
-    return user;
+    return await this.userService.create(username, result, role);
   }
 
   async signIn(email: string, password: string) {

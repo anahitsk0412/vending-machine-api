@@ -11,8 +11,11 @@ import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { UserDto } from '../user/dtos/user.dto';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { OrderDto } from './dtos/order.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { UserRole } from '../user/types/user-role.type';
 
 @Controller('order')
+@ApiTags('Order')
 export class OrderController {
   constructor(private orderService: OrderService) {}
   @Post()
@@ -21,7 +24,7 @@ export class OrderController {
     @Body() orderData: CreateOrderDto,
     @CurrentUser() user: UserDto,
   ): Promise<OrderDto & { change: number[] }> {
-    if (user.role !== 'buyer') {
+    if (user.role !== UserRole.BUYER) {
       throw new MethodNotAllowedException('Not enough permissions!');
     }
     return this.orderService.create(orderData, user.id);
