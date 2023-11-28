@@ -10,6 +10,7 @@ import { AuthGuard } from '../guards/auth.guard';
 import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { UserDto } from '../user/dtos/user.dto';
 import { CreateOrderDto } from './dtos/create-order.dto';
+import { OrderDto } from './dtos/order.dto';
 
 @Controller('order')
 export class OrderController {
@@ -19,7 +20,7 @@ export class OrderController {
   async create(
     @Body() orderData: CreateOrderDto,
     @CurrentUser() user: UserDto,
-  ) {
+  ): Promise<OrderDto & { change: number[] }> {
     if (user.role !== 'buyer') {
       throw new MethodNotAllowedException('Not enough permissions!');
     }

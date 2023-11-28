@@ -1,4 +1,10 @@
-import { Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Expose } from 'class-transformer';
 import { User } from '../user/user.entity';
 import { Product } from '../product/product.entity';
@@ -21,7 +27,7 @@ export class Order {
   @Column()
   sellerId: number;
 
-  @Column('decimal')
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   price: number;
 
   @CreateDateColumn({ name: 'createdAt' })
