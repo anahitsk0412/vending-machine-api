@@ -35,14 +35,6 @@ export class User {
   @Expose()
   products: Product[];
 
-  @ManyToMany(() => Order, (order) => order.sellers)
-  @Expose()
-  orders: Order[];
-
-  @ManyToMany(() => Order, (order) => order.buyers)
-  @Expose()
-  purchases: Order[];
-
   @AfterInsert()
   logInsert() {
     console.log('Inserted user id:', this.id);

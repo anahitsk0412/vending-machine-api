@@ -31,7 +31,6 @@ export class Product {
   @Expose()
   seller: User;
 
-  @ManyToMany(() => Order, (order) => order.products)
   @Expose()
   orders: Order[];
 }

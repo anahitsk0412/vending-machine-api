@@ -9,6 +9,8 @@ import {
   Session,
   UseGuards,
   MethodNotAllowedException,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -18,10 +20,10 @@ import { UserDto } from './dtos/user.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { ApiTags } from '@nestjs/swagger';
 import { AuthUserDto } from './dtos/auth-user.dto';
 import { UpdateDepositDto } from './dtos/update-deposit.dto';
 import { UserRole } from './types/user-role.type';
+import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('User')
 @Controller('user')
@@ -40,7 +42,7 @@ export class UserController {
 
   @Get(':id')
   @UseGuards(AuthGuard)
-  findUserById(@Param('id') id) {
+  findUserById(@Param('id') id: number) {
     return this.userService.findOne(id);
   }
   @Post('signup')
@@ -65,11 +67,17 @@ export class UserController {
   }
 
   @Post('signout')
-  @UseGuards(AuthGuard)
   async signOut(@Session() session: any) {
+    if (!session) {
+      throw new HttpException(
+        ' No authenticated user to sign out.',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+      // No authenticated user to sign out.' };
+    }
     session.userId = null;
     session.currentUser = null;
-    return { message: 'User signed out sucessfully!' };
+    return { message: 'User signed out successfully!' };
   }
 
   @Patch('deposit')

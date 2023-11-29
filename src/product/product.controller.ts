@@ -15,14 +15,18 @@ import { CurrentUser } from '../user/decorators/current-user.decorator';
 import { UserDto } from '../user/dtos/user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { UserRole } from '../user/types/user-role.type';
+import { ProductDto } from './dtos/product.dto';
+import { ProductCreateDto } from './dtos/create-product.dto';
+import { ProductUpdateDto } from './dtos/update-product.dto';
 
-@Controller('product')
 @ApiTags('Product')
+@Controller('product')
 export class ProductController {
   constructor(private productService: ProductService) {}
+
   @Get(':id')
   @UseGuards(AuthGuard)
-  findOne(@Param('id') id) {
+  findOne(@Param('id') id: number): Promise<ProductDto> {
     return this.productService.findOne(id);
   }
   @Get()
@@ -33,7 +37,10 @@ export class ProductController {
 
   @Post()
   @UseGuards(AuthGuard)
-  create(@Body() productData, @CurrentUser() user: UserDto) {
+  create(
+    @Body() productData: ProductCreateDto,
+    @CurrentUser() user: UserDto,
+  ): Promise<ProductDto> {
     if (user.role !== UserRole.SELLER) {
       throw new MethodNotAllowedException('Not enough permissions!');
     }
@@ -42,7 +49,11 @@ export class ProductController {
 
   @Patch(':id')
   @UseGuards(AuthGuard)
-  update(@Param('id') id, @Body() productData, @CurrentUser() user: UserDto) {
+  update(
+    @Param('id') id: number,
+    @Body() productData: ProductUpdateDto,
+    @CurrentUser() user: UserDto,
+  ): Promise<ProductDto> {
     if (user.role !== UserRole.SELLER) {
       throw new MethodNotAllowedException('Not enough permissions!');
     }
@@ -51,7 +62,7 @@ export class ProductController {
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  remove(@Param('id') id, @CurrentUser() user: UserDto) {
+  remove(@Param('id') id: number, @CurrentUser() user: UserDto) {
     if (user.role !== UserRole.SELLER) {
       throw new MethodNotAllowedException('Not enough permissions!');
     }
