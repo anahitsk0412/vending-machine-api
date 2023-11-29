@@ -1,6 +1,6 @@
 import { Injectable, MethodNotAllowedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, DataSource, QueryRunner, Repository } from 'typeorm';
 import { Order } from './order.entity';
 import { ProductService } from '../product/product.service';
 import { UserService } from '../user/user.service';
@@ -8,6 +8,8 @@ import { DepositRefillConstants } from '../utils/deposit-refill.constant';
 import { sumToArrayOptions } from '../utils/sum-to-array-options';
 import { OrderDto } from './dtos/order.dto';
 import { CreateOrderDto } from './dtos/create-order.dto';
+import { User } from '../user/user.entity';
+import { Product } from '../product/product.entity';
 
 @Injectable()
 export class OrderService {
@@ -15,6 +17,9 @@ export class OrderService {
     @InjectRepository(Order) private repo: Repository<Order>,
     private productService: ProductService,
     private userService: UserService,
+
+    private readonly connection: Connection,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(
@@ -39,39 +44,73 @@ export class OrderService {
       );
     }
 
+    const queryRunner = this.dataSource.createQueryRunner();
+
     try {
-      await this.productService.updateQuantity(
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      await this.decreaseProductAvailAmount(
         orderData.productId,
-        remainingQuantity,
+        orderData.quantity,
+        queryRunner,
       );
-      await this.userService.update(buyerId, {
-        deposit: 0,
-      });
+      const updatedUser = await this.updateUserDeposit(userData, queryRunner);
+
+      const createdOrder = await this.createOrder(
+        {
+          ...orderData,
+          price: totalPrice / 100,
+          buyerId: updatedUser.id,
+          sellerId: productData.sellerId,
+        },
+        queryRunner,
+      );
+
+      await queryRunner.commitTransaction();
+
+      // Calculate change to give back to user using available coin options
       const change = sumToArrayOptions(
         remainingUserBalance,
         DepositRefillConstants,
       );
 
-      const product = this.repo.create({
-        ...orderData,
-        price: totalPrice / 100,
-        buyerId,
-        sellerId: productData.sellerId,
-      });
-
-      const createdOrder = await this.repo.save(product);
-
       return { ...createdOrder, change };
     } catch (e) {
-      // rollback if there was something wrong between
-      await this.productService.updateQuantity(
-        orderData.productId,
-        remainingQuantity + orderData.quantity,
-      );
-      await this.userService.update(buyerId, {
-        deposit: userData.deposit,
-      });
+      //Using transaction to be able to roll back if something does not go well in between
+      await queryRunner.rollbackTransaction();
       throw new MethodNotAllowedException('Unable to create order!');
+    } finally {
+      await queryRunner.release();
     }
+  }
+
+  async updateUserDeposit(payload, queryRunner: QueryRunner) {
+    return await queryRunner.manager.save(User, {
+      ...payload,
+      deposit: 0,
+    });
+  }
+  async decreaseProductAvailAmount(
+    productId,
+    quantity,
+    queryRunner: QueryRunner,
+  ) {
+    // Using query builder here in case someone else has already decreased the
+    // available amount of the product
+    return await queryRunner.manager
+      .createQueryBuilder()
+      .update<Product>('product')
+      .set({
+        amountAvailable: () => `amountAvailable - ${quantity}`,
+      })
+      .where('id = :productId', { productId })
+      .execute();
+  }
+
+  async createOrder(payload, queryRunner: QueryRunner) {
+    return await queryRunner.manager.save(Order, {
+      ...payload,
+    });
   }
 }
