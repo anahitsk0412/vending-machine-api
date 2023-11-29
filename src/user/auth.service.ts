@@ -8,8 +8,9 @@ import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { UserRole } from './types/user-role.type';
 import { UserService } from './user.service';
-import { randomBytes, scrypt as _scrypt } from 'crypto';
+import { scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
+import { generatedHashedPassword } from '../utils/generated-hashed-password';
 
 const scrypt = promisify(_scrypt);
 
@@ -21,23 +22,16 @@ export class AuthService {
   ) {}
 
   async signUp(username: string, password: string, role: UserRole) {
-    const existingUser = await this.userService.find(username);
-    if (existingUser.length) {
-      throw new BadRequestException('Username in use!');
-    }
-
     // Hash the users password
     // Generate a salt
-    const salt = randomBytes(8).toString('hex');
-
-    // Hash the salt and the password together
-    const hash = (await scrypt(password, salt, 32)) as Buffer;
-
-    // Join the hashed result and the salt together
-    const result = salt + '.' + hash.toString('hex');
+    const saltedPass = await generatedHashedPassword(password);
 
     // Create a new user and save it
-    return await this.userService.create(username, result, role);
+    try {
+      return await this.userService.create(username, saltedPass, role);
+    } catch (e) {
+      throw new BadRequestException('Username in use!');
+    }
   }
 
   async signIn(email: string, password: string) {

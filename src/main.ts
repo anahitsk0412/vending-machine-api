@@ -11,6 +11,11 @@ async function bootstrap() {
   app.use(
     cookieSession({
       keys: ['jyke9sjkui8u'],
+      httpOnly: true,
+      signed: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day (adjust as needed)
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
     }),
   );
   app.useGlobalPipes(
@@ -26,8 +31,8 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('Vending Machine App')
-    .setDescription('The Vending Machine API description')
+    .setTitle('Vending Machine APIs')
+    .setDescription('APIs to handle Vending Machine logical interaction')
     .setVersion('1.0')
     .addTag('vending-machine')
     .build();

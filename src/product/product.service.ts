@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Product } from './product.entity';
 import { ProductCreateDto } from './dtos/create-product.dto';
 import { ProductUpdateDto } from './dtos/update-product.dto';
@@ -19,19 +19,13 @@ export class ProductService {
     return this.repo.save(product);
   }
 
-  async update(id: number, attrs: ProductUpdateDto, user: UserDto) {
+  async update(id: number, payload: ProductUpdateDto, user: UserDto) {
     const product = await this.findOne(id);
     if (user.id !== product.sellerId) {
       throw new MethodNotAllowedException('Not enough permissions!');
     }
-    return this.repo.save({ ...product, ...attrs });
+    return this.repo.save({ ...product, ...payload });
   }
-
-  async updateQuantity(id: number, amountAvailable: number) {
-    const product = await this.findOne(id);
-    return this.repo.save({ ...product, amountAvailable });
-  }
-
   async findOne(id: number) {
     const product = await this.repo.findOne({ where: { id } });
     if (!product) {
@@ -41,7 +35,7 @@ export class ProductService {
   }
 
   findAll() {
-    return this.repo.find();
+    return this.repo.find({ where: { amountAvailable: Not(0) } });
   }
 
   async remove(id: number, user: UserDto) {

@@ -10,6 +10,7 @@ import { OrderDto } from './dtos/order.dto';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { User } from '../user/user.entity';
 import { Product } from '../product/product.entity';
+import { UserDto } from '../user/dtos/user.dto';
 
 @Injectable()
 export class OrderService {
@@ -24,14 +25,13 @@ export class OrderService {
 
   async create(
     orderData: CreateOrderDto,
-    buyerId: number,
+    buyer: UserDto,
   ): Promise<OrderDto & { change: number[] }> {
-    const userData = await this.userService.findOne(buyerId);
     const productData = await this.productService.findOne(orderData.productId);
 
     const totalPrice = productData.cost * 100 * orderData.quantity;
 
-    const remainingUserBalance = userData.deposit * 100 - totalPrice;
+    const remainingUserBalance = buyer.deposit * 100 - totalPrice;
     const remainingQuantity = productData.amountAvailable - orderData.quantity;
 
     if (remainingUserBalance < 0) {
@@ -55,7 +55,8 @@ export class OrderService {
         orderData.quantity,
         queryRunner,
       );
-      const updatedUser = await this.updateUserDeposit(userData, queryRunner);
+
+      const updatedUser = await this.updateUserDeposit(buyer, queryRunner);
 
       const createdOrder = await this.createOrder(
         {

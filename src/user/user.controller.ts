@@ -85,11 +85,11 @@ export class UserController {
   @Patch('resetbalance')
   @UseGuards(AuthGuard)
   resetBalance(@CurrentUser() user: UserDto) {
-    if (user.role === UserRole.BUYER) {
+    if (user.role !== UserRole.BUYER) {
       throw new MethodNotAllowedException('Not enough permissions!');
     }
     // get current user id
-    return this.userService.resetBalance(user.id);
+    return this.userService.resetBalance(user);
   }
 
   @Patch(':id')
