@@ -1,9 +1,7 @@
 import { Injectable, MethodNotAllowedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, DataSource, QueryRunner, Repository } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
 import { Order } from './order.entity';
 import { ProductService } from '../product/product.service';
-import { UserService } from '../user/user.service';
 import { DepositRefillConstants } from '../utils/deposit-refill.constant';
 import { sumToArrayOptions } from '../utils/sum-to-array-options';
 import { OrderDto } from './dtos/order.dto';
@@ -15,11 +13,8 @@ import { UserDto } from '../user/dtos/user.dto';
 @Injectable()
 export class OrderService {
   constructor(
-    @InjectRepository(Order) private repo: Repository<Order>,
+    // @InjectRepository(Order) private repo: Repository<Order>,
     private productService: ProductService,
-    private userService: UserService,
-
-    private readonly connection: Connection,
     private readonly dataSource: DataSource,
   ) {}
 

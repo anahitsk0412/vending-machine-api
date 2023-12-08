@@ -73,7 +73,6 @@ export class UserController {
         ' No authenticated user to sign out.',
         HttpStatus.EXPECTATION_FAILED,
       );
-      // No authenticated user to sign out.' };
     }
     session.userId = null;
     session.currentUser = null;

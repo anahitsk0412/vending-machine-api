@@ -3,7 +3,6 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   ManyToOne,
-  ManyToMany,
 } from 'typeorm';
 import { Expose } from 'class-transformer';
 import { User } from '../user/user.entity';

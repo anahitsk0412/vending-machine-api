@@ -12,4 +12,7 @@ export class UserDto {
 
   @Expose()
   deposit: number;
+
+  @Expose()
+  change?: number[];
 }

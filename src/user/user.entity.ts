@@ -4,13 +4,11 @@ import {
   AfterUpdate,
   Column,
   Entity,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
 import { Product } from '../product/product.entity';
-import { Order } from '../order/order.entity';
 
 @Entity('user')
 export class User {
