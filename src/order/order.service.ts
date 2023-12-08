@@ -18,10 +18,7 @@ export class OrderService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(
-    orderData: CreateOrderDto,
-    buyer: UserDto,
-  ): Promise<OrderDto & { change: number[] }> {
+  async create(orderData: CreateOrderDto, buyer: UserDto): Promise<OrderDto> {
     const productData = await this.productService.findOne(orderData.productId);
 
     const totalPrice = productData.cost * 100 * orderData.quantity;
@@ -71,7 +68,7 @@ export class OrderService {
         DepositRefillConstants,
       );
 
-      return { ...createdOrder, change };
+      return { ...createdOrder, change, productName: productData.name };
     } catch (e) {
       //Using transaction to be able to roll back if something does not go well in between
       await queryRunner.rollbackTransaction();
