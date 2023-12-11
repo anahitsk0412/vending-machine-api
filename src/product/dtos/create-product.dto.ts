@@ -23,11 +23,4 @@ export class ProductCreateDto {
     required: true,
   })
   amountAvailable: number;
-
-  @IsNumber()
-  @ApiProperty({
-    example: 4,
-    required: true,
-  })
-  sellerId?: number;
 }
